@@ -28,6 +28,8 @@ export default function App() {
   const [transitioning, setTransitioning] = useState(false)
   const [showGrid, setShowGrid] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
 
   const goTo = useCallback((idx: number) => {
     if (transitioning || idx === current) return
@@ -48,6 +50,26 @@ export default function App() {
     } else {
       document.exitFullscreen()
       setIsFullscreen(false)
+    }
+  }
+
+  // Touch Swipe Handlers for Mobile Devices
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    const distance = touchStart - touchEnd
+    if (distance > 40) {
+      next()
+    } else if (distance < -40) {
+      prev()
     }
   }
 
@@ -73,15 +95,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [next, prev, goTo])
 
-  const handleDownload = async () => {
-    setDownloading(true)
-    try {
-      await generatePptx()
-    } finally {
-      setDownloading(false)
-    }
-  }
-
   const Slide = slides[current]
 
   return (
@@ -89,6 +102,7 @@ export default function App() {
       style={{
         width: '100vw',
         height: '100vh',
+        minHeight: '-webkit-fill-available',
         background: '#090D16',
         display: 'flex',
         flexDirection: 'column',
@@ -98,11 +112,11 @@ export default function App() {
         userSelect: 'none',
         position: 'relative',
         overflow: 'hidden',
+        padding: '8px',
       }}
     >
       {/* Top Controls Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10, zIndex: 10 }}>
-
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8, zIndex: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
         <button
           onClick={() => setShowGrid(!showGrid)}
           style={{
@@ -110,13 +124,14 @@ export default function App() {
             border: '1px solid rgba(255,255,255,0.12)',
             borderRadius: 8,
             color: 'white',
-            padding: '7px 14px',
+            padding: '6px 14px',
             cursor: 'pointer',
             fontSize: 12,
             fontWeight: 500,
             display: 'flex',
             alignItems: 'center',
             gap: 6,
+            minHeight: 36,
           }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -135,21 +150,24 @@ export default function App() {
             border: '1px solid rgba(255,255,255,0.12)',
             borderRadius: 8,
             color: 'white',
-            padding: '7px 12px',
+            padding: '6px 14px',
             cursor: 'pointer',
             fontSize: 12,
+            minHeight: 36,
           }}
         >
           {isFullscreen ? 'Exit Fullscreen' : '⛶ Fullscreen'}
         </button>
-        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       </div>
 
-      {/* Slide Container - 16:9 */}
+      {/* Slide Container - Responsive 16:9 */}
       <div
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         style={{
-          width: 'min(95vw, calc(88vh * 16/9))',
-          height: 'min(calc(95vw * 9/16), 88vh)',
+          width: 'min(96vw, calc(86vh * 16/9))',
+          height: 'min(calc(96vw * 9/16), 86vh)',
           position: 'relative',
           borderRadius: 12,
           overflow: 'hidden',
@@ -163,6 +181,7 @@ export default function App() {
             opacity: transitioning ? 0 : 1,
             transform: transitioning ? 'scale(0.995)' : 'scale(1)',
             transition: 'all 0.18s ease-out',
+            overflowY: 'auto',
           }}
         >
           <Slide />
@@ -170,28 +189,28 @@ export default function App() {
       </div>
 
       {/* Bottom Navigation */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 10, color: 'rgba(255,255,255,0.7)', zIndex: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8, color: 'rgba(255,255,255,0.7)', zIndex: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
         <button
           onClick={prev}
           disabled={current === 0}
           style={{
             background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6,
             color: current === 0 ? 'rgba(255,255,255,0.2)' : 'white',
-            padding: '5px 14px', cursor: current === 0 ? 'not-allowed' : 'pointer',
-            fontFamily: "'Inter', sans-serif", fontSize: 12.5, fontWeight: 500,
+            padding: '6px 14px', cursor: current === 0 ? 'not-allowed' : 'pointer',
+            fontFamily: "'Inter', sans-serif", fontSize: 12.5, fontWeight: 500, minHeight: 36,
           }}
         >
           ← Prev
         </button>
 
-        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center', overflowX: 'auto', maxWidth: '50vw', padding: '4px 0' }}>
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => goTo(i)}
               title={slideTitles[i]}
               style={{
-                width: i === current ? 22 : 6, height: 6, borderRadius: 3,
+                width: i === current ? 20 : 6, height: 6, borderRadius: 3, flexShrink: 0,
                 background: i === current ? '#2563EB' : 'rgba(255,255,255,0.25)',
                 border: 'none', padding: 0, cursor: 'pointer',
                 transition: 'all 0.2s ease',
@@ -206,41 +225,44 @@ export default function App() {
           style={{
             background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6,
             color: current === slides.length - 1 ? 'rgba(255,255,255,0.2)' : 'white',
-            padding: '5px 14px', cursor: current === slides.length - 1 ? 'not-allowed' : 'pointer',
-            fontFamily: "'Inter', sans-serif", fontSize: 12.5, fontWeight: 500,
+            padding: '6px 14px', cursor: current === slides.length - 1 ? 'not-allowed' : 'pointer',
+            fontFamily: "'Inter', sans-serif", fontSize: 12.5, fontWeight: 500, minHeight: 36,
           }}
         >
           Next →
         </button>
 
-        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginLeft: 6 }}>
+        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>
           {current + 1} / {slides.length}
         </span>
       </div>
 
       {/* Grid Modal Selector Overlay */}
       {showGrid && (
-        <div style={{
-          position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.94)',
-          backdropFilter: 'blur(12px)', zIndex: 100, display: 'flex', flexDirection: 'column',
-          padding: '32px 48px', overflowY: 'auto',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div
+          className="index-modal"
+          style={{
+            position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.96)',
+            backdropFilter: 'blur(14px)', zIndex: 100, display: 'flex', flexDirection: 'column',
+            padding: '28px 36px', overflowY: 'auto',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div>
-              <h2 style={{ color: 'white', margin: 0, fontSize: 20, fontFamily: "'Poppins', sans-serif" }}>Presentation Overview</h2>
-              <p style={{ color: 'rgba(255,255,255,0.5)', margin: 0, fontSize: 12 }}>Click any slide to jump directly</p>
+              <h2 style={{ color: 'white', margin: 0, fontSize: 18, fontFamily: "'Poppins', sans-serif" }}>Presentation Index</h2>
+              <p style={{ color: 'rgba(255,255,255,0.5)', margin: 0, fontSize: 11 }}>Tap any slide to jump directly</p>
             </div>
             <button
               onClick={() => setShowGrid(false)}
               style={{
                 background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white',
-                borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 13,
+                borderRadius: 8, padding: '8px 14px', cursor: 'pointer', fontSize: 12, minHeight: 36,
               }}
             >
               ✕ Close
             </button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
+          <div className="index-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
             {slideTitles.map((title, i) => (
               <div
                 key={i}
@@ -249,17 +271,17 @@ export default function App() {
                   setShowGrid(false)
                 }}
                 style={{
-                  background: i === current ? '#2563EB15' : 'rgba(255,255,255,0.05)',
+                  background: i === current ? '#2563EB18' : 'rgba(255,255,255,0.05)',
                   border: i === current ? '2px solid #2563EB' : '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 10, padding: 14, cursor: 'pointer',
+                  borderRadius: 10, padding: 12, cursor: 'pointer',
                   transition: 'all 0.15s ease',
-                  display: 'flex', flexDirection: 'column', gap: 6,
+                  display: 'flex', flexDirection: 'column', gap: 4,
                 }}
               >
-                <div style={{ fontSize: 11, fontWeight: 700, color: i === current ? '#2563EB' : 'rgba(255,255,255,0.5)', fontFamily: "'Poppins', sans-serif" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: i === current ? '#2563EB' : 'rgba(255,255,255,0.5)', fontFamily: "'Poppins', sans-serif" }}>
                   SLIDE {i + 1}
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: 'white' }}>
+                <div style={{ fontSize: 11.5, fontWeight: 600, color: 'white', lineHeight: 1.3 }}>
                   {title.replace(/^\d+\s*/, '')}
                 </div>
               </div>
