@@ -130,17 +130,7 @@ function addSlide1(prs: pptxgen) {
     fontSize: 9, color: WHITE + 'AA', fontFace: 'Calibri', lineSpacingMultiple: 1.4,
   })
 
-  // KPIs
-  const kpis = [
-    { label: 'Restaurants Served', val: '2,400+' },
-    { label: 'Daily Transactions', val: '1.2M+' },
-    { label: 'Uptime SLA', val: '99.9%' },
-  ]
-  kpis.forEach((k, i) => {
-    const x = 0.5 + i * 1.7
-    slide.addText(k.val, { x, y: 3.1, w: 1.5, h: 0.35, fontSize: 18, bold: true, color: WHITE, fontFace: 'Calibri' })
-    slide.addText(k.label, { x, y: 3.45, w: 1.5, h: 0.2, fontSize: 7.5, color: WHITE + '66', fontFace: 'Calibri' })
-  })
+
 
   // Right panel cards
   const rcards = [
@@ -271,38 +261,60 @@ function addSlide4(prs: pptxgen) {
   slide.addShape('rect', { x: 0, y: 0, w: W, h: H, fill: { color: WHITE }, line: { color: WHITE } })
   slideHeader(slide, 'Product Ecosystem', 'Complete Restaurant Management Hub', 'Everything connected — real-time, bidirectional data flow across all modules')
 
-  // Hub center
-  slide.addShape('ellipse', { x: 4.25, y: 2.25, w: 1.5, h: 1.05, fill: { color: BLUE }, line: { color: BLUE } })
-  slide.addText('RESTAURANT\nPOS PLATFORM', {
-    x: 4.25, y: 2.25, w: 1.5, h: 1.05,
-    fontSize: 8, bold: true, color: WHITE, align: 'center', valign: 'middle', fontFace: 'Calibri', lineSpacingMultiple: 1.2,
-  })
-
-  const spokes = [
-    { label: 'POS Billing', color: BLUE, x: 1.2, y: 1.0 },
-    { label: 'Kitchen KDS', color: ORANGE, x: 4.0, y: 1.1 },
-    { label: 'Inventory', color: AMBER, x: 7.0, y: 1.0 },
-    { label: 'CRM', color: VIOLET, x: 8.2, y: 2.6 },
-    { label: 'Reports', color: EMERALD, x: 7.2, y: 4.1 },
-    { label: 'Payments', color: PINK, x: 4.5, y: 4.6 },
-    { label: 'Online Orders', color: CYAN, x: 2.0, y: 4.3 },
-    { label: 'Loyalty', color: AMBER, x: 0.5, y: 3.0 },
-    { label: 'Analytics', color: INDIGO, x: 1.3, y: 2.0 },
-    { label: 'Admin', color: SLATE, x: 6.2, y: 2.2 },
+  const leftMods = [
+    { label: 'POS Billing', desc: 'Fast checkout & GST engine', color: BLUE },
+    { label: 'Kitchen KDS', desc: 'Live ticket display & prep timer', color: ORANGE },
+    { label: 'Inventory & Recipe', desc: 'Auto stock deduction & alerts', color: AMBER },
+    { label: 'CRM & Loyalty', desc: '360° customer profile & rewards', color: VIOLET },
+    { label: 'Analytics & BI', desc: 'Real-time sales & profit reports', color: EMERALD },
   ]
 
-  const hubX = 5.0, hubY = 2.78
-  spokes.forEach(s => {
-    // line from hub to node
-    slide.addShape('line', {
-      x: Math.min(hubX, s.x + 0.3), y: Math.min(hubY, s.y + 0.2),
-      w: Math.abs(hubX - (s.x + 0.3)), h: Math.abs(hubY - (s.y + 0.2)),
-      line: { color: s.color + '55', width: 1, dashType: 'dash' },
-      flipH: hubX < s.x + 0.3,
-      flipV: hubY < s.y + 0.2,
-    })
-    slide.addShape('ellipse', { x: s.x, y: s.y, w: 1.0, h: 0.5, fill: { color: s.color + '22' }, line: { color: s.color, width: 1 } })
-    slide.addText(s.label, { x: s.x, y: s.y, w: 1.0, h: 0.5, fontSize: 7.5, bold: true, color: s.color, align: 'center', valign: 'middle', fontFace: 'Calibri' })
+  const rightMods = [
+    { label: 'Online Orders', desc: 'Swiggy/Zomato direct integration', color: CYAN },
+    { label: 'Payments Engine', desc: 'UPI, Cards, Cash & Split pay', color: PINK },
+    { label: 'Multi-Outlet Admin', desc: 'Central menu & branch control', color: ORANGE },
+    { label: 'QR Ordering', desc: 'Contactless table ordering', color: BLUE },
+    { label: 'Role Access', desc: 'Granular staff permissions', color: VIOLET },
+  ]
+
+  // Left Column (5 cards)
+  leftMods.forEach((m, i) => {
+    const y = 1.2 + i * 0.82
+    card(slide, 0.4, y, 2.7, 0.72)
+    slide.addShape('rect', { x: 0.4, y, w: 0.06, h: 0.72, fill: { color: m.color }, line: { color: m.color } })
+    slide.addText(m.label, { x: 0.58, y: y + 0.08, w: 2.4, h: 0.24, fontSize: 9.5, bold: true, color: NAVY, fontFace: 'Calibri' })
+    slide.addText(m.desc, { x: 0.58, y: y + 0.32, w: 2.4, h: 0.32, fontSize: 8, color: SLATE, fontFace: 'Calibri' })
+  })
+
+  // Center Hub Card
+  slide.addShape('roundRect', { x: 3.4, y: 1.4, w: 3.2, h: 3.6, rectRadius: 0.12, fill: { color: NAVY }, line: { color: BLUE + '44' } })
+  slide.addShape('ellipse', { x: 4.6, y: 1.7, w: 0.8, h: 0.8, fill: { color: BLUE }, line: { color: BLUE } })
+  slide.addText('⚡', { x: 4.6, y: 1.7, w: 0.8, h: 0.8, fontSize: 24, align: 'center', valign: 'middle', fontFace: 'Calibri' })
+
+  slide.addText('CENTRAL DATA BUS', { x: 3.5, y: 2.6, w: 3.0, h: 0.22, fontSize: 7, bold: true, color: EMERALD, align: 'center', fontFace: 'Calibri', charSpacing: 1 })
+  slide.addText('Restaurant POS Platform', { x: 3.5, y: 2.85, w: 3.0, h: 0.35, fontSize: 13, bold: true, color: WHITE, align: 'center', fontFace: 'Calibri' })
+  slide.addText('Unified event-driven core orchestrating real-time sync across all 10 modules', { x: 3.6, y: 3.22, w: 2.8, h: 0.45, fontSize: 8, color: WHITE + 'AA', align: 'center', fontFace: 'Calibri', lineSpacingMultiple: 1.2 })
+
+  slide.addShape('line', { x: 3.6, y: 3.78, w: 2.8, h: 0, line: { color: WHITE + '22', width: 0.5 } })
+
+  const metrics = [
+    { v: '< 50ms', l: 'Sync Latency', c: EMERALD },
+    { v: 'Bidirectional', l: 'Data Flow', c: BLUE },
+    { v: 'Offline-First', l: 'Auto Re-Sync', c: AMBER },
+  ]
+  metrics.forEach((m, i) => {
+    const mx = 3.5 + i * 1.0
+    slide.addText(m.v, { x: mx, y: 3.9, w: 1.0, h: 0.22, fontSize: 8.5, bold: true, color: m.c, align: 'center', fontFace: 'Calibri' })
+    slide.addText(m.l, { x: mx, y: 4.12, w: 1.0, h: 0.2, fontSize: 6.5, color: WHITE + '77', align: 'center', fontFace: 'Calibri' })
+  })
+
+  // Right Column (5 cards)
+  rightMods.forEach((m, i) => {
+    const y = 1.2 + i * 0.82
+    card(slide, 6.9, y, 2.7, 0.72)
+    slide.addShape('rect', { x: 9.54, y, w: 0.06, h: 0.72, fill: { color: m.color }, line: { color: m.color } })
+    slide.addText(m.label, { x: 7.02, y: y + 0.08, w: 2.4, h: 0.24, fontSize: 9.5, bold: true, color: NAVY, fontFace: 'Calibri' })
+    slide.addText(m.desc, { x: 7.02, y: y + 0.32, w: 2.4, h: 0.32, fontSize: 8, color: SLATE, fontFace: 'Calibri' })
   })
 }
 
@@ -312,35 +324,36 @@ function addSlide5(prs: pptxgen) {
   slideHeader(slide, 'Core Features', '16 Powerful Modules Built In', 'Everything your restaurant needs — out of the box, no plugins required')
 
   const features = [
-    { label: 'Billing Software', color: BLUE },
-    { label: 'GST Billing', color: EMERALD },
-    { label: 'Table Management', color: AMBER },
-    { label: 'KOT Generation', color: ORANGE },
-    { label: 'Menu Management', color: VIOLET },
-    { label: 'Inventory Mgmt', color: CYAN },
-    { label: 'Recipe Mgmt', color: EMERALD },
-    { label: 'Expense Tracking', color: PINK },
-    { label: 'Customer CRM', color: INDIGO },
-    { label: 'Loyalty Program', color: AMBER },
-    { label: 'QR Ordering', color: BLUE },
-    { label: 'Multi-Outlet', color: ORANGE },
-    { label: 'Reports', color: EMERALD },
-    { label: 'Role Based Access', color: VIOLET },
-    { label: 'Offline Billing', color: PINK },
-    { label: 'Cloud Sync', color: BLUE },
+    { label: 'Billing Engine', desc: 'Fast checkout, split bills & customization', color: BLUE },
+    { label: 'GST Compliance', desc: 'Auto tax computation & E-invoicing export', color: EMERALD },
+    { label: 'Table Management', desc: 'Visual floor map & real-time occupancy', color: AMBER },
+    { label: 'KOT Generation', desc: 'Instant kitchen ticket routing & timers', color: ORANGE },
+    { label: 'Menu Management', desc: 'Dynamic pricing, variants & combo menus', color: VIOLET },
+    { label: 'Inventory Control', desc: 'Real-time stock deduction on every order', color: CYAN },
+    { label: 'Recipe Mgmt', desc: 'Ingredient mapping & food cost tracking', color: EMERALD },
+    { label: 'Expense Tracker', desc: 'Log daily outlet expenses & petty cash', color: PINK },
+    { label: 'Customer CRM', desc: '360° guest profiles & order preferences', color: INDIGO },
+    { label: 'Loyalty Engine', desc: 'Automated points, rewards & WhatsApp perks', color: AMBER },
+    { label: 'QR Ordering', desc: 'Contactless digital menu & table ordering', color: BLUE },
+    { label: 'Multi-Outlet Admin', desc: 'Centralized menu, pricing & branch control', color: ORANGE },
+    { label: 'Reports & BI', desc: '50+ real-time financial & sales insights', color: EMERALD },
+    { label: 'Role Permissions', desc: 'Granular access for cashiers & staff', color: VIOLET },
+    { label: 'Offline Billing', desc: 'Uninterrupted billing during outages', color: PINK },
+    { label: 'Cloud Sync', desc: 'Instant multi-device cloud synchronization', color: BLUE },
   ]
 
-  const cols = 8
+  const cols = 4
   features.forEach((f, i) => {
     const col = i % cols
     const row = Math.floor(i / cols)
-    const x = 0.22 + col * 1.2
-    const y = 1.18 + row * 2.05
-    const w = 1.08, h = 1.85
+    const x = 0.4 + col * 2.32
+    const y = 1.15 + row * 1.02
+    const w = 2.16, h = 0.9
     card(slide, x, y, w, h)
-    slide.addShape('roundRect', { x: x + 0.3, y: y + 0.18, w: 0.48, h: 0.48, rectRadius: 0.07, fill: { color: f.color + '22' }, line: { color: f.color + '22' } })
-    slide.addText('✦', { x: x + 0.3, y: y + 0.18, w: 0.48, h: 0.48, fontSize: 16, color: f.color, align: 'center', valign: 'middle', fontFace: 'Calibri' })
-    slide.addText(f.label, { x: x + 0.04, y: y + 0.76, w: w - 0.08, h: 0.65, fontSize: 7.5, bold: true, color: NAVY, align: 'center', fontFace: 'Calibri', lineSpacingMultiple: 1.2 })
+    slide.addShape('roundRect', { x: x + 0.12, y: y + 0.15, w: 0.38, h: 0.38, rectRadius: 0.07, fill: { color: f.color + '22' }, line: { color: f.color + '22' } })
+    slide.addText('✦', { x: x + 0.12, y: y + 0.15, w: 0.38, h: 0.38, fontSize: 13, color: f.color, align: 'center', valign: 'middle', fontFace: 'Calibri' })
+    slide.addText(f.label, { x: x + 0.58, y: y + 0.12, w: w - 0.66, h: 0.24, fontSize: 9, bold: true, color: NAVY, fontFace: 'Calibri' })
+    slide.addText(f.desc, { x: x + 0.58, y: y + 0.36, w: w - 0.66, h: 0.48, fontSize: 7.5, color: SLATE, fontFace: 'Calibri', lineSpacingMultiple: 1.1 })
   })
 }
 
@@ -535,13 +548,13 @@ function addSlide9(prs: pptxgen) {
   slideHeader(slide, 'Inventory', 'Smart Inventory & Recipe Management', 'AI-powered stock tracking with automatic deduction on every order')
 
   // Left flow
-  slide.addText('Inventory Flow', { x: 0.3, y: 1.2, w: 4, h: 0.25, fontSize: 11, bold: true, color: NAVY, fontFace: 'Calibri' })
+  slide.addText('Automated Inventory Flow', { x: 0.3, y: 1.2, w: 4, h: 0.25, fontSize: 11, bold: true, color: NAVY, fontFace: 'Calibri' })
   const flow = [
-    { label: 'Supplier', color: ORANGE },
-    { label: 'Purchase Order', color: AMBER },
-    { label: 'Inventory', color: BLUE },
+    { label: 'Supplier Mgmt', color: ORANGE },
+    { label: 'Inward Purchase', color: AMBER },
+    { label: 'Central Inventory', color: BLUE },
     { label: 'Recipe Mapping', color: VIOLET },
-    { label: 'Customer Order', color: EMERALD },
+    { label: 'Order Placement', color: EMERALD },
     { label: 'Auto Stock Deduction', color: PINK },
   ]
   flow.forEach((f, i) => {
@@ -549,24 +562,21 @@ function addSlide9(prs: pptxgen) {
     card(slide, 0.3, y, 4.2, 0.5)
     slide.addShape('roundRect', { x: 0.42, y: y + 0.07, w: 0.36, h: 0.36, rectRadius: 0.06, fill: { color: f.color + '22' }, line: { color: f.color + '22' } })
     slide.addText('►', { x: 0.42, y: y + 0.07, w: 0.36, h: 0.36, fontSize: 12, color: f.color, align: 'center', valign: 'middle', fontFace: 'Calibri' })
-    slide.addText(f.label, { x: 0.88, y: y + 0.12, w: 3.5, h: 0.26, fontSize: 9.5, bold: i === 5, color: NAVY, fontFace: 'Calibri' })
+    slide.addText(f.label, { x: 0.88, y: y + 0.12, w: 3.5, h: 0.26, fontSize: 9.5, bold: true, color: NAVY, fontFace: 'Calibri' })
     if (i === 5) {
       slide.addShape('roundRect', { x: 3.2, y: y + 0.1, w: 1.1, h: 0.25, rectRadius: 0.08, fill: { color: EMERALD_LIGHT }, line: { color: EMERALD + '55' } })
-      slide.addText('Automated', { x: 3.2, y: y + 0.1, w: 1.1, h: 0.25, fontSize: 7, bold: true, color: EMERALD, align: 'center', valign: 'middle', fontFace: 'Calibri' })
-    }
-    if (i < flow.length - 1) {
-      slide.addShape('line', { x: 0.6, y: y + 0.5, w: 0, h: 0.13, line: { color: f.color + '66', width: 1.5, endArrowType: 'arrow' } })
+      slide.addText('Real-Time', { x: 3.2, y: y + 0.1, w: 1.1, h: 0.25, fontSize: 7, bold: true, color: EMERALD, align: 'center', valign: 'middle', fontFace: 'Calibri' })
     }
   })
 
   // Right: stock
   slide.addText('Live Stock Levels', { x: 5.0, y: 1.2, w: 4.5, h: 0.25, fontSize: 11, bold: true, color: NAVY, fontFace: 'Calibri' })
   const items = [
-    { name: 'Chicken Breast', stock: 82, alert: false },
-    { name: 'Basmati Rice', stock: 45, alert: false },
-    { name: 'Paneer', stock: 12, alert: true },
-    { name: 'Tomatoes', stock: 65, alert: false },
-    { name: 'Cooking Oil', stock: 8, alert: true },
+    { name: 'Chicken Breast (41 kg / 50 kg)', stock: 82, alert: false },
+    { name: 'Basmati Rice (45 kg / 100 kg)', stock: 45, alert: false },
+    { name: 'Paneer (2.4 kg / 20 kg)', stock: 12, alert: true },
+    { name: 'Tomatoes (19.5 kg / 30 kg)', stock: 65, alert: false },
+    { name: 'Cooking Oil (4L / 50L)', stock: 8, alert: true },
   ]
   items.forEach((item, i) => {
     const barColor = item.stock < 20 ? RED : item.stock < 40 ? AMBER : EMERALD
@@ -575,7 +585,7 @@ function addSlide9(prs: pptxgen) {
 
   // Auto PO note
   slide.addShape('roundRect', { x: 5.0, y: 4.75, w: 4.7, h: 0.62, rectRadius: 0.08, fill: { color: EMERALD_LIGHT }, line: { color: EMERALD + '55' } })
-  slide.addText('⚡  Auto Purchase Orders', { x: 5.15, y: 4.82, w: 4.4, h: 0.22, fontSize: 9.5, bold: true, color: NAVY, fontFace: 'Calibri' })
+  slide.addText('⚡  Auto Purchase Order Trigger', { x: 5.15, y: 4.82, w: 4.4, h: 0.22, fontSize: 9.5, bold: true, color: NAVY, fontFace: 'Calibri' })
   slide.addText('System auto-generates POs when stock falls below threshold', { x: 5.15, y: 5.04, w: 4.4, h: 0.22, fontSize: 8, color: SLATE, fontFace: 'Calibri' })
 }
 
@@ -999,17 +1009,7 @@ function addSlide19(prs: pptxgen) {
     x: 1.5, y: 3.18, w: 7, h: 0.6, fontSize: 10.5, color: WHITE + '88', align: 'center', fontFace: 'Calibri', lineSpacingMultiple: 1.5,
   })
 
-  // CTA buttons
-  slide.addShape('roundRect', { x: 2.5, y: 3.92, w: 2.1, h: 0.42, rectRadius: 0.08, fill: { color: BLUE }, line: { color: BLUE } })
-  slide.addText('Schedule a Demo', { x: 2.5, y: 3.92, w: 2.1, h: 0.42, fontSize: 10, bold: true, color: WHITE, align: 'center', valign: 'middle', fontFace: 'Calibri' })
-  slide.addShape('roundRect', { x: 5.4, y: 3.92, w: 2.1, h: 0.42, rectRadius: 0.08, fill: { color: WHITE + '18' }, line: { color: WHITE + '33' } })
-  slide.addText('Request a Proposal', { x: 5.4, y: 3.92, w: 2.1, h: 0.42, fontSize: 10, color: WHITE + 'CC', align: 'center', valign: 'middle', fontFace: 'Calibri' })
 
-  // Contact
-  const contacts = ['🌐  www.restaurantpos.in', '📞  +91 98765 43210', '✉  hello@restaurantpos.in']
-  contacts.forEach((c, i) => {
-    slide.addText(c, { x: 1.0 + i * 2.75, y: 4.52, w: 2.6, h: 0.2, fontSize: 8.5, color: WHITE + '66', align: 'center', fontFace: 'Calibri' })
-  })
 
   // Footer
   slide.addText('Confidential — For Discussion Purposes Only', { x: 0.5, y: H - 0.22, w: 5, h: 0.18, fontSize: 7, color: WHITE + '44', fontFace: 'Calibri' })
@@ -1021,7 +1021,7 @@ function addSlide19(prs: pptxgen) {
 export async function generatePptx() {
   const prs = new pptxgen()
 
-  prs.layout = 'LAYOUT_WIDE'
+  prs.layout = 'LAYOUT_16x9'
   prs.title = 'Restaurant POS & Billing Software'
   prs.subject = 'Smart. Fast. Scalable.'
   prs.company = 'Restaurant POS Platform'
