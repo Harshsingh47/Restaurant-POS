@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { slides } from './slides'
 
 const slideTitles = [
@@ -30,6 +30,21 @@ export default function App() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(1)
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (containerRef.current) {
+        const cw = containerRef.current.clientWidth
+        setScale(cw / 1280)
+      }
+    }
+    updateScale()
+    window.addEventListener('resize', updateScale)
+    return () => window.removeEventListener('resize', updateScale)
+  }, [])
 
   const goTo = useCallback((idx: number) => {
     if (transitioning || idx === current) return
@@ -160,14 +175,15 @@ export default function App() {
         </button>
       </div>
 
-      {/* Slide Container - Responsive 16:9 */}
+      {/* Slide Container - Scale-to-Fit 16:9 */}
       <div
+        ref={containerRef}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         style={{
-          width: 'min(96vw, calc(86vh * 16/9))',
-          height: 'min(calc(96vw * 9/16), 86vh)',
+          width: 'min(98vw, calc(86vh * 16/9))',
+          height: 'calc(min(98vw, calc(86vh * 16/9)) * 9 / 16)',
           position: 'relative',
           borderRadius: 12,
           overflow: 'hidden',
@@ -176,12 +192,12 @@ export default function App() {
       >
         <div
           style={{
-            width: '100%',
-            height: '100%',
+            width: 1280,
+            height: 720,
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
             opacity: transitioning ? 0 : 1,
-            transform: transitioning ? 'scale(0.995)' : 'scale(1)',
-            transition: 'all 0.18s ease-out',
-            overflowY: 'auto',
+            transition: 'opacity 0.18s ease-out',
           }}
         >
           <Slide />

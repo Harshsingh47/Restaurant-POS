@@ -68,13 +68,14 @@ const SlideWrap = ({ children, bg = WHITE, style }: {
   style?: React.CSSProperties
 }) => (
   <div style={{
-    width: '100%',
-    height: '100%',
+    width: 1280,
+    height: 720,
     background: bg,
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
     position: 'relative',
+    boxSizing: 'border-box',
     ...style,
   }}>
     {children}
