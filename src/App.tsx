@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
 import { slides } from './slides'
-import { generatePptx } from './generatePptx'
 
 const slideTitles = [
   '01 Cover',
@@ -27,7 +26,6 @@ const slideTitles = [
 export default function App() {
   const [current, setCurrent] = useState(0)
   const [transitioning, setTransitioning] = useState(false)
-  const [downloading, setDownloading] = useState(false)
   const [showGrid, setShowGrid] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
 
@@ -104,44 +102,6 @@ export default function App() {
     >
       {/* Top Controls Bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10, zIndex: 10 }}>
-        <button
-          onClick={handleDownload}
-          disabled={downloading}
-          style={{
-            background: downloading ? 'rgba(37,99,235,0.5)' : 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
-            border: 'none',
-            borderRadius: 8,
-            color: 'white',
-            padding: '7px 18px',
-            cursor: downloading ? 'not-allowed' : 'pointer',
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 12.5,
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            boxShadow: '0 4px 14px rgba(37,99,235,0.35)',
-            transition: 'all 0.15s ease',
-          }}
-        >
-          {downloading ? (
-            <>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}>
-                <path d="M21 12a9 9 0 11-6.219-8.56"/>
-              </svg>
-              Generating PPTX…
-            </>
-          ) : (
-            <>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Download PPTX (19 Slides)
-            </>
-          )}
-        </button>
 
         <button
           onClick={() => setShowGrid(!showGrid)}
